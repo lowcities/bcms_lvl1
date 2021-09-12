@@ -10,7 +10,7 @@ var seedArray = seedPhrase.split(" ");
 // convert seed array back to String while removing commas
 var reSeed = seedArray.toString(" ").replace(/\,/g, " ");
 
-console.log(seedPhrase);
+console.log(reSeed);
 
 
 
