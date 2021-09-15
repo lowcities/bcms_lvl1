@@ -6,11 +6,12 @@ var mnemonic = new bcash.Mnemonic("vacant shiver similar power oil real riot foo
 // Convert seed phrase to String
 var seedPhrase = mnemonic.toString();
 // convert phrase string to Array
-var seedArray = seedPhrase.split(" ");
+var phraseArray = seedPhrase.split(" ");
 // convert seed array back to String while removing commas
-var reSeed = seedArray.toString(" ").replace(/\,/g, " ");
+// var rePhrase = phraseArray.toString(" ").replace(/\,/g, " ");
+var joinPhrase = phraseArray.join(' ');
 
-console.log(reSeed);
+console.log(joinPhrase);
 
 
 
