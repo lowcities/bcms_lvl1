@@ -9,11 +9,11 @@ var seedPhrase = mnemonic.toString();
 var phraseArray = seedPhrase.split(" ");
 // convert seed array back to String while removing commas
 // var rePhrase = phraseArray.toString(" ").replace(/\,/g, " ");
-var joinPhrase = phraseArray.join(' ');
+var rePhrase = phraseArray.join(' ');
 
-console.log(joinPhrase);
+console.log(rePhrase);
 
-
+ß
 
 
 
