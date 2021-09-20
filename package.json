@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "axios": "^0.21.3",
-    "bcash": "github:badger-cash/bcash"
+    "bcash": "github:badger-cash/bcash",
+    "express": "^4.17.1"
   }
 }
