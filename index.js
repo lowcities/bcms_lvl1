@@ -2,7 +2,7 @@
 
 var bcash = require("bcash");
 var axios = require("axios");
-const {WalletClient, Network, WalletDB, KeyRing} = require('bcash');
+const {Network, KeyRing, Coin} = require('bcash');
 // Establish BCH network
 const network = Network.get('main');
 
@@ -23,20 +23,15 @@ var rePhrase = phraseArray.join(' ');
 // // console.log("Array: ", phraseArray);
 
 
-var master = bcash.hd.fromMnemonic(mnemonic); 
-var hdkey = master.derivePath("m/44'/145'/0/0'/0");
-var xpubKey  = hdkey.xpubkey();//Derive Extended public key
-var child = hdkey.derive(0, false);//Derive a child key from master key
-var ringLegacy = KeyRing.fromPublic(child.publicKey);
-var legAddress = ringLegacy.getAddress('base58', network);//create address from public key
+let master = bcash.hd.fromMnemonic(mnemonic); 
+let hdkey = master.derivePath("m/44'/145'/0/0'");
+let xpubKey  = hdkey.xpubkey();//Derive Extended public key
+let child = hdkey.derive(0, false);//Derive a child key from master key
+let keyRing = KeyRing.fromPublic(child.publicKey);
+let bchAddress = keyRing.getAddress('string', network);//create address from public key
+let grandChildKey1 = child.derive(0);// child key derived from child from higher depth
+let address1 = KeyRing.fromPrivate(grandChildKey1.privateKey).getAddress('string');//segwit address from grandChildKey1
 
-
-let addressArray = [];
-let temp;
-for(let i = 0; i <= 20; i++) {
-    temp = hdkey.derive(i, false);
-    addressArray.push(KeyRing.fromPublic(temp.publicKey).getAddress('base58', network));
-}
 
 // Function creates an object of 20 BCH addresses from Master Public Key
 function addressCollection () {
@@ -46,17 +41,41 @@ function addressCollection () {
         //derive child key from index value = to iteration value and temporarily hold in variable
         temp = hdkey.derive(i, false);
         //add key name to object with number equal to iterator + 1; add address obtained derived key in temp variable
-        addressObject[`Address ${i + 1}`] = KeyRing.fromPublic(temp.publicKey).getAddress('base58', network)
+        addressObject[`Address ${i + 1}`] = KeyRing.fromPublic(temp.publicKey).getAddress()
     }
     return addressObject;
 }
 
+const keyRingArray = [];
+for(let i = 0; i < 19; i++) {
+    const grandChild = child.derive(i);
+    const keyRing2 = KeyRing.fromPrivate(grandChild.privateKey);
+    keyRingArray.push(keyRing2);
+}
 
-console.log('Extended Public Key:', xpubKey);
-console.log('Private key of child:', child.privateKey);
-console.log(`BCH Address Array: ${addressArray}`);
 
-console.log(`BCH Address Object: `, addressCollection());
+
+(async function() {
+
+    try {
+        const result = await axios.get(`https://bcash.badger.cash:8332/coin/address/${address1}`);
+        const utxos = result.data;
+        
+        console.log('utxos: ', utxos);
+        
+    } catch (error) {
+        console.error(error);
+    }
+                  
+})();
+
+// console.log('Extended Public Key:', xpubKey);
+// console.log('Private key of child:', child.privateKey);
+// console.log(`BCH Address Array: ${addressArray}`);
+
+// console.log(`BCH Address Object: `, addressCollection());
+
+// console.log('Key Ring Array: ', keyRingArray.map(keyring => keyring.getKeyAddress('string')));
 
 
 
