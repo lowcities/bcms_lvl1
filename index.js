@@ -46,13 +46,17 @@ function addressCollection () {
     return addressObject;
 }
 
-const keyRingArray = [];
-for(let i = 0; i < 19; i++) {
+
+//Function creates an array of KeyRing objects from Private child key of child key
+const createKeyRingArray = function () {
+    const keyRingArray = [];
+    for(let i = 0; i < 19; i++) {
     const grandChild = child.derive(i);
     const keyRing2 = KeyRing.fromPrivate(grandChild.privateKey);
     keyRingArray.push(keyRing2);
+    }
+    return keyRingArray;
 }
-
 
 
 (async function() {
