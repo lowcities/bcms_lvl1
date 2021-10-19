@@ -86,7 +86,7 @@ async function CoinTx() {
 
         console.log('tx', tx);
         console.log('raw tx hex', tx.toRaw().toString('hex'));
-        // broadcasts transaction to BCH nodegit add --all
+        // broadcasts transaction to BCH node
         const broadcastResult  = axios.post('https://bcash.badger.cash:8332/broadcast', {
             tx: tx.toRaw().toString('hex')
         })
