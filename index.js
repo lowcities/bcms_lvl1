@@ -39,7 +39,8 @@ function addressCollection () {
 
 
 
-// Function queries a BCH node and derives UTXO data of a particular address then creates a Coin object with data
+// Function queries a BCH node and derives UTXO data of a particular address 
+// then creates a Coin object with data, then creates a transaction and broadcasts it to BCH node
 async function CoinTx() {
      try {
         const result = await axios.get(`https://bcash.badger.cash:8332/coin/address/${address1}`);
@@ -80,12 +81,12 @@ async function CoinTx() {
             changeAddress: createKeyRingArray()[1].getKeyAddress('string'),
             rate: 1000
         });
-
+        // signs transaction with keyring
         tx.sign(createKeyRingArray());
 
         console.log('tx', tx);
         console.log('raw tx hex', tx.toRaw().toString('hex'));
-
+        // broadcasts transaction to BCH node
         const broadcastResult  = axios.post('https://bcash.badger.cash:8332/broadcast', {
             tx: tx.toRaw().toString('hex')
         })
