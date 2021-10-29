@@ -66,20 +66,20 @@ async function CoinTx() {
            
         }); 
         
-        console.log(UTXOArray);
+        console.log(firstUTXO.address);
 
         // Create new transaction
         const tx = new bcash.MTX();
         // Address output and amount of funds being sent
         tx.addOutput({
             address: address1,
-            value: 700
+            value: null
         });
 
         // UTXO being used in transaction, address for any returned change as well as rate(fee)for transaction
         await tx.fund([firstCoin], {
             changeAddress: createKeyRingArray()[1].getKeyAddress('string'),
-            rate: 1000
+            rate: null
         });
         // signs transaction with keyring
         tx.sign(createKeyRingArray());
@@ -116,20 +116,26 @@ function getAddress(arr) {
     //calls the getUTXOS function on each address in the array and returns the data
     return addressArray;
 }
+//Function accepts an array of addresses and returns an array of address objects
 function createAddressObject (arr) {
-    let addressObject = {}
-    let temp;
+    let addressArray = [];
     for(let i = 0; i < arr.length; i++) {
        //add key name to object with number equal to iterator + 1; add address obtained derived key in temp variable
-        addressObject[arr[i].getAddress('string')] = null;
+       addressArray.push({address: arr[i].getAddress('string'), UTXOS: null});
+       
     }
-    return addressObject;
+    return addressArray;
 }
 
 
 let ringArray = createKeyRingArray();
 let addArray = getAddress(ringArray);
 hdWallet = createAddressObject(ringArray);
+
+
+
+
+
 //Function queries node with BCH address argument
 async function getUTXOS(address) {
     
@@ -145,37 +151,55 @@ async function getUTXOS(address) {
             UTXOArray.push(coin);
             
         }
-        return UTXOArray;
+        return console.log(UTXOArray);
     }   
     catch (error) {
         console.error(error);
     }
 };
-async function test() {
-let reqArr = [];
-let temp;
-let coinArray;
-for(let i = 0; i < addArray.length; i++) {
-    temp = axios.get(`https://bcash.badger.cash:8332/coin/address/${addArray[i]}`);
-    reqArr.push(temp);
-}
-const res = await Promise.all(reqArr)
-const data = res.map((res)=> res.data);
-console.log(data[0]);
-
-}
-
-CoinTx();
-// console.log(getAddress(createKeyRingArray()).map(address => hdWallet[address] = getUTXOS(address)));
 
 
-// console.log('Extended Public Key:', xpubKey);
-// console.log('Private key of child:', child.privateKey);
-// console.log(`BCH Address Array: ${addressArray}`);
 
-// console.log(`BCH Address Object: `, addressCollection());
 
-// console.log('Key Ring Array: ', keyRingArray.map(keyring => keyring.getKeyAddress('string')));
+async function queryMultiAddress(arr) {
+    let reqArr = [];
+    let temp;
+    
+    for(let i = 0; i < arr.length; i++) {
+        temp = axios.get(`https://bcash.badger.cash:8332/coin/address/${arr[i]}`);
+        reqArr.push(temp);
+    };
+
+    const res = await Promise.all(reqArr)
+    const data = res.map((res)=> res.data);
+    // const firstUTXO = data[0][0].address;
+    return data;
+;}
+
+
+queryMultiAddress(addArray).then(data => {
+    hdWallet.map((key) => {
+        for(let i = 0; i < data.length; i++) {
+            for(let j = 0; j < data[i].length; j++) {
+                // console.log(data[i][j].address);
+                if(data[i][j].address === key.address) {
+                    key.UTXOS = new Coin().fromJSON(data[i][j]);
+                }  
+            }    
+        }
+        return hdWallet;
+    })
+    console.log(hdWallet);
+})
+
+
+
+
+
+
+
+
+
 
 
 
