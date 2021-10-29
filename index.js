@@ -121,7 +121,7 @@ function createAddressObject (arr) {
     let addressArray = [];
     for(let i = 0; i < arr.length; i++) {
        //add key name to object with number equal to iterator + 1; add address obtained derived key in temp variable
-       addressArray.push({address: arr[i].getAddress('string'), UTXOS: null});
+       addressArray.push({address: arr[i].getAddress('string'), balance: null});
        
     }
     return addressArray;
@@ -172,7 +172,6 @@ async function queryMultiAddress(arr) {
 
     const res = await Promise.all(reqArr)
     const data = res.map((res)=> res.data);
-    // const firstUTXO = data[0][0].address;
     return data;
 ;}
 
@@ -181,9 +180,8 @@ queryMultiAddress(addArray).then(data => {
     hdWallet.map((key) => {
         for(let i = 0; i < data.length; i++) {
             for(let j = 0; j < data[i].length; j++) {
-                // console.log(data[i][j].address);
                 if(data[i][j].address === key.address) {
-                    key.UTXOS = new Coin().fromJSON(data[i][j]);
+                    key.balance = data[i][j].value;
                 }  
             }    
         }
